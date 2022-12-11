@@ -19,8 +19,9 @@ serde = { version = "^1.0.126", features = ["derive"] }
 chrono = { version = "^0.4.19", features = ["std", "serde"], default_features = false }
 fnv = "1.0"
 hashbrown = { version = "0.12", features = ["inline-more", "serde"], default_features = false }
-pulldown-cmark = { version = "0.9", default_features = false }
+pulldown-cmark = { version = "0.9.2", default_features = false }
 cmark-syntax = "0.3"
+comrak = "0.15"
 
 # Cargo doesn't support binary-only dependencies yet.
 toml = { version = "0.5.9", optional = true }

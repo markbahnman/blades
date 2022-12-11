@@ -11,6 +11,8 @@ use crate::site::{default_true, Site};
 use crate::sources::{Parser, Source, Sources};
 use crate::taxonomies::{Classification, Taxonomies};
 use crate::types::{Ancestors, Any, DateTime, HashMap};
+use comrak::plugins::syntect::SyntectAdapter;
+use comrak::{markdown_to_html_with_plugins, ComrakOptions, ComrakPlugins};
 
 use beef::lean::Cow;
 use ramhorns::{
@@ -705,10 +707,17 @@ impl<'p, 'r> PageList<'p, 'r> {
 #[inline]
 fn render_content<E: Encoder>(source: &str, encoder: &mut E) -> Result<(), E::Error> {
     let normalized_source = source.replace("\r\n", "\n");
-    let parser =
-        pulldown_cmark::Parser::new_ext(&normalized_source, pulldown_cmark::Options::all());
-    let processed = cmark_syntax::SyntaxPreprocessor::new(parser);
-    encoder.write_html(processed)
+    let adapter = SyntectAdapter::new("base16-ocean.dark");
+    let options = ComrakOptions::default();
+    let mut plugins = ComrakPlugins::default();
+
+    plugins.render.codefence_syntax_highlighter = Some(&adapter);
+
+    let processed = markdown_to_html_with_plugins(&normalized_source, &options, &plugins);
+    // let parser =
+    //     pulldown_cmark::Parser::new_ext(&normalized_source, pulldown_cmark::Options::all());
+    // let processed = cmark_syntax::SyntaxPreprocessor::new(parser);
+    encoder.write_unescaped(&processed)
 }
 
 impl<'p, 'r> Content for PageList<'p, 'r> {
